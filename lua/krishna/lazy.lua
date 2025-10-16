@@ -11,7 +11,6 @@ end
 
 vim.opt.rtp:prepend(vim.env.LAZY or lazypath)
 require("lazy").setup({
-
     spec = {
         -- UI Plugins
         {
@@ -58,10 +57,16 @@ require("lazy").setup({
                 require("crates").setup()
             end,
         },
+        {
+            'mfussenegger/nvim-jdtls',
+            dependencies = {
+                'mfussenegger/nvim-dap',
+            },
+        },
         { "nvim-treesitter/nvim-treesitter", build = ":TSUpdate" },
         {
             "nvim-treesitter/playground",
-            enabled = false,
+            enabled = true,
         },
         {
             "L3MON4D3/LuaSnip",
@@ -72,6 +77,16 @@ require("lazy").setup({
         },
         "williamboman/mason.nvim",
         "williamboman/mason-lspconfig.nvim",
+        {
+            "mfussenegger/nvim-dap",
+            event = "VeryLazy",
+            dependencies = {
+                "rcarriga/nvim-dap-ui",
+                "nvim-neotest/nvim-nio",
+                "jay-babu/mason-nvim-dap.nvim",
+                "theHamsta/nvim-dap-virtual-text",
+            }
+        },
         {
             "saghen/blink.cmp",
             -- optional: provides snippets for the snippet source
