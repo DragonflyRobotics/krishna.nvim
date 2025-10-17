@@ -1,7 +1,8 @@
-local m = require("mapx").setup({
-	global = true,
-	whichkey = false,
-})
+local vim = vim
+local noremap = require("mapx").noremap
+local nnoremap = require("mapx").nnoremap
+local tnoremap = require("mapx").tnoremap
+local xnoremap = require("mapx").xnoremap
 
 vim.g.mapleader = " "
 
@@ -24,31 +25,31 @@ nnoremap("<leader>u", ":UndotreeToggle<CR>")
 
 -- Spectre
 vim.keymap.set("n", "<leader>S", '<cmd>lua require("spectre").toggle()<CR>', {
-	desc = "Toggle Spectre",
+    desc = "Toggle Spectre",
 })
 vim.keymap.set("n", "<leader>Sw", '<cmd>lua require("spectre").open_visual({select_word=true})<CR>', {
-	desc = "Search current word",
+    desc = "Search current word",
 })
 vim.keymap.set("v", "<leader>Sw", '<esc><cmd>lua require("spectre").open_visual()<CR>', {
-	desc = "Search current word",
+    desc = "Search current word",
 })
 vim.keymap.set("n", "<leader>Sp", '<cmd>lua require("spectre").open_file_search({select_word=true})<CR>', {
-	desc = "Search on current file",
+    desc = "Search on current file",
 })
 vim.keymap.set("n", "<leader>Stu", '<cmd>lua require("spectre").toggle_live_update()<CR>', {
-	desc = "Toggle live update",
+    desc = "Toggle live update",
 })
 -- Spectre replace
 vim.keymap.set("n", "<leader>Sr", '<cmd>lua require("spectre.actions").run_current_replace()<CR>', {
-	desc = "Replace current word",
+    desc = "Replace current word",
 })
 vim.keymap.set("n", "<leader>SR", '<cmd>lua require("spectre.actions").run_replace()<CR>', {
-	desc = "Replace all occurrences of current word",
+    desc = "Replace all occurrences of current word",
 })
 
 -- SSR
 nnoremap("<leader>RR", function()
-	require("ssr").open()
+    require("ssr").open()
 end)
 
 -- Neogit
@@ -118,12 +119,6 @@ nnoremap("<M-l>", "<cmd>MakeitOpen<CR>")
 nnoremap("<M-r>", "<cmd>MakeitRedo<CR>")
 nnoremap("<M-x>", "<cmd>MakeitBuild<CR>")
 nnoremap("<M-t>", "<cmd>MakeitToggleResults<CR>")
--- nnoremap("<C-b>", ":BuildGeneric<CR>")
--- nnoremap("<C-r>", ":RunGeneric<CR>")
--- nnoremap("<M-e>", ":copen<CR>")
--- nnoremap("<M-c>", ":cclose<CR>")
--- nnoremap("<M-n>", ":cnext<CR>")
--- nnoremap("<M-p>", ":cprev<CR>")
 
 -- ROS2
 nnoremap("<leader>m", ":Telescope ros2-nvim topic_telescope<CR>")
@@ -147,3 +142,40 @@ vim.api.nvim_set_keymap("v", "<leader>ct", "<cmd>CodeCompanionChat Toggle<CR>", 
 
 -- TSHT
 nnoremap("<C-U>", "<CMD>lua require('tsht').nodes()<CR>")
+
+
+-- DAP
+local dap = require("dap")
+local dapui = require("dapui")
+-- Basic controls
+vim.keymap.set("n", "<F5>", dap.continue, { desc = "Start/Continue Debugging" })
+vim.keymap.set("n", "<F7>", dap.step_over, { desc = "Step Over" })
+vim.keymap.set("n", "<F8>", dap.step_into, { desc = "Step Into" })
+vim.keymap.set("n", "<F9>", dap.step_out, { desc = "Step Out" })
+vim.keymap.set("n", "<F10>", dap.toggle_breakpoint, { desc = "Toggle Breakpoint" })
+
+-- Conditional & log breakpoints
+vim.keymap.set("n", "<leader>db", function()
+    dap.set_breakpoint(vim.fn.input("Breakpoint condition: "))
+end, { desc = "Set Conditional Breakpoint" })
+
+vim.keymap.set("n", "<leader>dl", function()
+    dap.set_breakpoint(nil, nil, vim.fn.input("Log point message: "))
+end, { desc = "Set Log Point" })
+
+-- REPL and execution
+vim.keymap.set("n", "<leader>dr", dap.repl.open, { desc = "Open REPL" })
+vim.keymap.set("n", "<leader>dq", dap.terminate, { desc = "Terminate Debug Session" })
+
+-- UI control
+vim.keymap.set("n", "<leader>du", dapui.toggle, { desc = "Toggle DAP UI" })
+vim.keymap.set("n", "<leader>de", dapui.eval, { desc = "Evaluate Expression" })
+
+-- Hover eval (great for inspecting values under cursor)
+vim.keymap.set("n", "K", function()
+    if dap.session() then
+        dapui.eval()
+    else
+        vim.lsp.buf.hover()
+    end
+end, { desc = "Hover (DAP or LSP)" })
