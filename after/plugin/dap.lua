@@ -64,7 +64,28 @@ dap.configurations.rust = {
 
 ui.setup()
 
-vim.fn.sign_define("DapBreakpoint", { text = "🐞" })
+vim.o.signcolumn = "yes"
+
+
+-- DAP Signs
+vim.fn.sign_define('DapBreakpoint', { text = '', texthl = 'DapBreakpoint', linehl = '', numhl = '' })
+vim.fn.sign_define('DapBreakpointCondition', { text = '', texthl = 'DapBreakpointCondition', linehl = '', numhl = '' })
+vim.fn.sign_define('DapLogPoint', { text = '', texthl = 'DapLogPoint', linehl = '', numhl = '' })
+vim.fn.sign_define('DapStopped', { text = '', texthl = 'DapStopped', linehl = '', numhl = '' })
+
+-- Highlight Groups (colors)
+vim.cmd([[
+  augroup DapColors
+    autocmd!
+    autocmd ColorScheme * hi DapBreakpoint guifg=#ff5555
+    autocmd ColorScheme * hi DapBreakpointCondition guifg=#f1fa8c
+    autocmd ColorScheme * hi DapLogPoint guifg=#8be9fd
+    autocmd ColorScheme * hi DapStopped guifg=#50fa7b
+  augroup END
+]])
+
+
+
 
 dap.listeners.before.attach.dapui_config = function()
     ui.open()
