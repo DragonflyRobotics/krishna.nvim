@@ -8,7 +8,7 @@ dap_virtual_text.setup()
 
 
 mason_dap.setup({
-    ensure_installed = { "node2", "python", "javadbg", "codelldb" },
+    ensure_installed = { "python", "javadbg", "codelldb" },
     automatic_installation = true,
     handlers = {
         function(config)
