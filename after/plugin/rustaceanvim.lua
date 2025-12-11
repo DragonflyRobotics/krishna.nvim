@@ -11,8 +11,16 @@ vim.g.rustaceanvim = {
             -- rust-analyzer language server configuration
             ['rust-analyzer'] = {
                 cargo = {
-                    allFeatures = true, -- Enable all features in Cargo.toml
+                    allFeatures = true,          -- Enable all features in Cargo.toml
                     loadOutDirsFromCheck = true, -- Load output directories from `cargo check`
+                },
+                -- Disable checkonsave and disgnostics to use bacon instead
+                checkOnSave = { enable = false },
+                diagnostics = { enable = false },
+                procMacro = { enable = true }, -- keep this ON unless bacon handles it
+                inlayHints = {
+                    parameterHints = true,
+                    typeHints = true,
                 },
             },
         },
@@ -21,3 +29,10 @@ vim.g.rustaceanvim = {
     dap = {
     },
 }
+
+vim.lsp.config('bacon-ls', {
+    init_options = {
+        updateOnSave = true,
+        updateOnSaveWaitMillis = 1000,
+    }
+})

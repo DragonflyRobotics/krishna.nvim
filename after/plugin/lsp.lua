@@ -170,10 +170,38 @@ vim.api.nvim_create_autocmd({ "CursorMoved" }, {
     end,
 })
 
-vim.o.updatetime = 300 -- how fast the hover shows (ms)
+-- vim.o.updatetime = 300 -- how fast the hover shows (ms)
+--
+-- vim.api.nvim_create_autocmd("CursorHold", {
+--     callback = function()
+--         vim.diagnostic.open_float(nil, {
+--             focusable = false,
+--             close_events = { "BufLeave", "CursorMoved", "InsertEnter", "FocusLost" },
+--             border = "rounded",
+--             source = "always",
+--             prefix = "",
+--             scope = "cursor",
+--         })
+--     end,
+-- })
+vim.o.updatetime = 300 -- delay before CursorHold triggers
 
 vim.api.nvim_create_autocmd("CursorHold", {
     callback = function()
+        -- Close any existing floating diagnostics to avoid stacking
+        for _, win in ipairs(vim.api.nvim_list_wins()) do
+            local cfg = vim.api.nvim_win_get_config(win)
+            if cfg.relative ~= "" and cfg.zindex then
+                vim.api.nvim_win_close(win, true)
+            end
+        end
+
+        -- Only show if there is a diagnostic on the current line
+        local diags = vim.diagnostic.get(0, { lnum = vim.fn.line('.') - 1 })
+        if vim.tbl_isempty(diags) then
+            return
+        end
+
         vim.diagnostic.open_float(nil, {
             focusable = false,
             close_events = { "BufLeave", "CursorMoved", "InsertEnter", "FocusLost" },
@@ -184,6 +212,15 @@ vim.api.nvim_create_autocmd("CursorHold", {
         })
     end,
 })
+
+
+
+vim.keymap.set("n", "gH", function()
+    vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+end, { desc = "Toggle LSP inlay hints" })
+
+
+
 
 local function make_italic(group)
     local ok, hl = pcall(vim.api.nvim_get_hl, 0, { name = group, link = false })

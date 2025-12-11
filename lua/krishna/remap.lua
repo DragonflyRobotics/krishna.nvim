@@ -172,10 +172,37 @@ vim.keymap.set("n", "<leader>du", dapui.toggle, { desc = "Toggle DAP UI" })
 vim.keymap.set("n", "<leader>de", dapui.eval, { desc = "Evaluate Expression" })
 
 -- Hover eval (great for inspecting values under cursor)
+-- vim.keymap.set("n", "K", function()
+--     if dap.session() then
+--         dapui.eval()
+--     else
+--         vim.lsp.buf.hover()
+--     end
+-- end, { desc = "Hover (DAP or LSP)" })
+--
 vim.keymap.set("n", "K", function()
-    if dap.session() then
+    local ok_dap, dap = pcall(require, "dap")
+    local ok_ui, dapui = pcall(require, "dapui")
+
+    -- 1️⃣ DAP first
+    if ok_dap and ok_ui and dap.session() then
         dapui.eval()
-    else
-        vim.lsp.buf.hover()
+        return
     end
-end, { desc = "Hover (DAP or LSP)" })
+
+    -- 2️⃣ Diagnostics for current line
+    local diags = vim.diagnostic.get(0, { lnum = vim.fn.line('.') - 1 })
+    if not vim.tbl_isempty(diags) then
+        vim.diagnostic.open_float(nil, {
+            focusable = false,
+            border = "rounded",
+            source = "always",
+            prefix = "",
+            scope = "cursor",
+        })
+        return
+    end
+
+    -- 3️⃣ Fallback to LSP hover
+    vim.lsp.buf.hover()
+end, { desc = "DAP eval / Diagnostic / LSP hover" })
