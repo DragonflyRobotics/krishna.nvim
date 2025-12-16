@@ -108,12 +108,6 @@ require("lazy").setup({
             dependencies = { "saghen/blink.cmp" },
         },
         "stevearc/conform.nvim",
-        {
-            "nvimtools/none-ls.nvim",
-            dependencies = {
-                "nvimtools/none-ls-extras.nvim",
-            },
-        },
         "onsails/lspkind.nvim",
         {
             "folke/trouble.nvim",

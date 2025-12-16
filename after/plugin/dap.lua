@@ -60,6 +60,45 @@ dap.configurations.rust = {
     },
 }
 
+dap.configurations.cpp = {
+    {
+        name = "Launch file",
+        type = "codelldb",
+        request = "launch",
+        program = function()
+            return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+        end,
+        cwd = '${workspaceFolder}',
+        stopOnEntry = false,
+    },
+}
+
+dap.configurations.c = dap.configurations.cpp
+dap.configurations.cuda = dap.configurations.cpp
+
+
+local function get_python_path(workspace)
+    if vim.env.VIRTUAL_ENV then
+        return vim.env.VIRTUAL_ENV .. "/bin/python"
+    end
+    local venv = workspace .. "/.venv/bin/python"
+    if vim.fn.executable(venv) == 1 then
+        return venv
+    end
+    return "/usr/bin/python"
+end
+dap.configurations.python = {
+    {
+        type = "python",
+        request = "launch",
+        name = "Launch file",
+        program = "${file}",
+        pythonPath = function()
+            return get_python_path(vim.fn.getcwd())
+        end,
+    },
+}
+
 -- Dap UI
 
 ui.setup()

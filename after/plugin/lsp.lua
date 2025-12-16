@@ -7,6 +7,31 @@ require("mason-lspconfig").setup({
 })
 
 
+vim.lsp.config.pylsp = {
+    settings = {
+        pylsp = {
+            plugins = {
+                pyflakes = { enabled = true },                        -- Fast static analysis (catch undefined names, etc.)
+                pycodestyle = { enabled = true, maxLineLength = 88 }, -- PEP8 style checking
+                flake8 = { enabled = false },                         -- Optional alternative to pyflakes/pycodestyle
+                mccabe = { enabled = true, threshold = 15 },          -- Cyclomatic complexity checker
+                yapf = { enabled = false },                           -- Code formatting
+                black = { enabled = true },                           -- Black formatter (popular)
+                isort = { enabled = false },                          -- Import sorter
+                rope_completion = { enabled = false },                -- Intelligent Python completions (optional)
+                jedi_completion = { enabled = true },                 -- Alternative to rope
+                jedi_hover = { enabled = true },                      -- Hover docs via Jedi
+                jedi_references = { enabled = true },
+                jedi_signature_help = { enabled = true },
+                pylsp_mypy = { enabled = true },  -- Type checking (optional, needs mypy installed)
+                pylint = { enabled = false },     -- Alternative linter
+                pylsp_black = { enabled = true }, -- Black integration
+            }
+        }
+    }
+}
+
+
 require("blink.cmp").setup({
     -- 'default' (recommended) for mappings similar to built-in completions (C-y to accept)
     -- 'super-tab' for mappings similar to vscode (tab to accept)
