@@ -89,7 +89,7 @@ nnoremap("gr", "<CMD>Lspsaga rename<CR>")
 nnoremap("gR", "<CMD>Lspsaga rename ++project<CR>")
 nnoremap("gt", "<CMD>Lspsaga peek_type_definition<CR>")
 nnoremap("gT", "<CMD>Lspsaga goto_type_definition<CR>")
-nnoremap("gf", "<CMD>Lspsaga lsp_finder<CR>")
+nnoremap("gf", "<CMD>Lspsaga finder<CR>")
 nnoremap("<leader>ca", "<CMD>Lspsaga code_action<CR>")
 
 -- ASToggle

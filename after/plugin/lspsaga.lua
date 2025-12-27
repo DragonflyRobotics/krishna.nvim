@@ -2,9 +2,17 @@ require('lspsaga').setup({
     ui = {
         code_action = ""
     },
+    finder = {
+        methods = {
+            "definitions",
+            "references",
+            "implementations",
+            "type_definitions"
+        }
+    },
 })
 
--- enable diagnostic virtual text 
+-- enable diagnostic virtual text
 vim.diagnostic.config({
     virtual_text = {
         prefix = '', -- Could be '●', '▎', 'x'
@@ -23,4 +31,3 @@ vim.diagnostic.config({
         prefix = "",
     },
 })
-

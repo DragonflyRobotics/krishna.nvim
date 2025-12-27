@@ -223,8 +223,7 @@ require("lazy").setup({
             lazy = true,
         },
         "nosduco/remote-sshfs.nvim",
-        "nvimdev/lspsaga.nvim",
-
+        'nvimdev/lspsaga.nvim',
         {
             "j-hui/fidget.nvim",
             lazy = true,
