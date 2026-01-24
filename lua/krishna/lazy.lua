@@ -65,10 +65,6 @@ require("lazy").setup({
         },
         { "nvim-treesitter/nvim-treesitter", build = ":TSUpdate" },
         {
-            "nvim-treesitter/playground",
-            enabled = true,
-        },
-        {
             "L3MON4D3/LuaSnip",
             -- follow latest release.
             version = "v2.*", -- Replace <CurrentMajor> by the latest released major (first number of latest release)
@@ -90,7 +86,7 @@ require("lazy").setup({
         {
             "saghen/blink.cmp",
             -- optional: provides snippets for the snippet source
-            dependencies = { "rafamadriz/friendly-snippets" },
+            dependencies = { "rafamadriz/friendly-snippets", "fang2hou/blink-copilot" },
 
             -- use a release tag to download pre-built binaries
             version = "1.*",
@@ -117,7 +113,23 @@ require("lazy").setup({
             lazy = true,
         },
         {
-            "github/copilot.vim",
+            "zbirenbaum/copilot.lua",
+            cmd = "Copilot",
+            event = "InsertEnter",
+            opts = {
+                suggestion = {
+                    enabled = true,                 -- enable suggestions
+                    auto_trigger = true,            -- suggest as you type
+                    debounce = 75,                  -- adjust if needed
+                    multi_line = true,              -- enable multiline ghost text!
+                    hide_during_completion = false, -- don't hide ghost text when menu open
+                },
+                panel = { enabled = false },
+                filetypes = {
+                    markdown = true,
+                    help = true,
+                },
+            },
         },
         {
             "olimorris/codecompanion.nvim",
@@ -147,6 +159,18 @@ require("lazy").setup({
                 "antoinemadec/FixCursorHold.nvim",
                 "nvim-treesitter/nvim-treesitter",
             },
+        },
+        {
+            'windwp/nvim-autopairs',
+            event = "InsertEnter",
+            config = true
+            -- use opts = {} for passing setup options
+            -- this is equivalent to setup({}) function
+        },
+        "tpope/vim-surround",
+        {
+            'wakatime/vim-wakatime',
+            lazy = false,
         },
 
         -- Navigation
@@ -196,12 +220,6 @@ require("lazy").setup({
             },
         },
         {
-            "tris203/precognition.nvim",
-            opts = {
-                startVisible = false, -- start with the preview window visible
-            },
-        },
-        {
             "ggandor/leap.nvim",
             dependencies = {
                 "tpope/vim-repeat", -- for repeating the last leap command
@@ -209,7 +227,10 @@ require("lazy").setup({
         },
 
         -- Utilities
-        { "mbbill/undotree",                 lazy = false },
+        {
+            "mbbill/undotree",
+            lazy = false,
+        },
         {
             "Pocco81/auto-save.nvim",
             config = function()
@@ -222,8 +243,10 @@ require("lazy").setup({
             "numToStr/Comment.nvim",
             lazy = true,
         },
-        "nosduco/remote-sshfs.nvim",
-        'nvimdev/lspsaga.nvim',
+        {
+            'nvimdev/lspsaga.nvim',
+            enbled = false,
+        },
         {
             "j-hui/fidget.nvim",
             lazy = true,

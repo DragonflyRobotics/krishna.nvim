@@ -7,6 +7,7 @@ vim.opt.termguicolors = true
 
 -- empty setup using defaults
 require("nvim-tree").setup({
+    sync_root_with_cwd = true,   -- ensures the tree root follows your CWD
     renderer = {
         group_empty = true,
     },
@@ -17,5 +18,3 @@ require("nvim-tree").setup({
     },
     open_on_tab = true,
 })
-
-

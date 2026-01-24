@@ -1,16 +1,16 @@
-require('lspsaga').setup({
-    ui = {
-        code_action = ""
-    },
-    finder = {
-        methods = {
-            "definitions",
-            "references",
-            "implementations",
-            "type_definitions"
-        }
-    },
-})
+-- require('lspsaga').setup({
+--     ui = {
+--         code_action = ""
+--     },
+--     finder = {
+--         methods = {
+--             "definitions",
+--             "references",
+--             "implementations",
+--             "type_definitions"
+--         }
+--     },
+-- })
 
 -- enable diagnostic virtual text
 vim.diagnostic.config({

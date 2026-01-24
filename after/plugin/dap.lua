@@ -60,18 +60,36 @@ dap.configurations.rust = {
     },
 }
 
+-- dap.configurations.cpp = {
+--     {
+--         name = "Launch file",
+--         type = "codelldb",
+--         request = "launch",
+--         program = function()
+--             return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+--         end,
+--         cwd = '${workspaceFolder}',
+--         stopOnEntry = false,
+--     },
+-- }
+
 dap.configurations.cpp = {
     {
         name = "Launch file",
         type = "codelldb",
         request = "launch",
         program = function()
-            return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+            return vim.fn.input(
+                'Path to executable: ',
+                vim.fn.getcwd() .. '/a.out', -- CHANGE DEFAULT HERE
+                'file'
+            )
         end,
         cwd = '${workspaceFolder}',
         stopOnEntry = false,
     },
 }
+
 
 dap.configurations.c = dap.configurations.cpp
 dap.configurations.cuda = dap.configurations.cpp
@@ -125,13 +143,17 @@ vim.cmd([[
 
 
 
+dap.listeners.after.event_initialized["dapui_config"] = function()
+    ui.open()
+end
+dap.listeners.before.event_terminated["dapui_config"] = function()
+    ui.close()
+end
+dap.listeners.before.event_exited["dapui_config"] = function()
+    ui.close()
+end
 
-dap.listeners.before.attach.dapui_config = function()
-    ui.open()
-end
-dap.listeners.before.launch.dapui_config = function()
-    ui.open()
-end
+
 -- dap.listeners.before.event_terminated.dapui_config = function()
 --     ui.close()
 -- end

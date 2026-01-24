@@ -7,80 +7,190 @@ require("mason-lspconfig").setup({
 })
 
 
-vim.lsp.config.pylsp = {
+local capabilities = vim.lsp.protocol.make_client_capabilities()
+capabilities.general = {
+    positionEncodings = { "utf-16" },
+}
+-- Enable completion capabilities for blink.cmp
+capabilities.textDocument.completion.completionItem.snippetSupport = true
+capabilities.textDocument.completion.completionItem.resolveSupport = {
+    properties = { "documentation", "detail", "additionalTextEdits" },
+}
+
+-- Reduce debounce time for faster LSP updates
+vim.lsp.set_log_level("ERROR") -- Only log errors, not all LSP traffic
+
+-- Faster LSP response times
+vim.opt.updatetime = 100 -- Default is 4000ms, way too slow
+
+
+vim.lsp.config.basedpyright = {
+    capabilities = capabilities,
     settings = {
-        pylsp = {
-            plugins = {
-                pyflakes = { enabled = true },                        -- Fast static analysis (catch undefined names, etc.)
-                pycodestyle = { enabled = true, maxLineLength = 88 }, -- PEP8 style checking
-                flake8 = { enabled = false },                         -- Optional alternative to pyflakes/pycodestyle
-                mccabe = { enabled = true, threshold = 15 },          -- Cyclomatic complexity checker
-                yapf = { enabled = false },                           -- Code formatting
-                black = { enabled = true },                           -- Black formatter (popular)
-                isort = { enabled = false },                          -- Import sorter
-                rope_completion = { enabled = false },                -- Intelligent Python completions (optional)
-                jedi_completion = { enabled = true },                 -- Alternative to rope
-                jedi_hover = { enabled = true },                      -- Hover docs via Jedi
-                jedi_references = { enabled = true },
-                jedi_signature_help = { enabled = true },
-                pylsp_mypy = { enabled = true },  -- Type checking (optional, needs mypy installed)
-                pylint = { enabled = false },     -- Alternative linter
-                pylsp_black = { enabled = true }, -- Black integration
-            }
-        }
-    }
+        basedpyright = {
+            analysis = {
+                typeCheckingMode = "basic", -- Enable for better completions
+                diagnosticMode = "openFilesOnly",
+                autoSearchPaths = true,
+                useLibraryCodeForTypes = true,
+                autoImportCompletions = true, -- CRITICAL for package imports
+
+                -- JETBRAINS-STYLE INDEXING
+                indexing = true,
+                packageIndexDepths = {
+                    -- Index these packages deeply for completions
+                    torch = 3,
+                    numpy = 3,
+                    pandas = 3,
+                    sklearn = 3,
+                    tensorflow = 3,
+                    transformers = 3,
+                    -- Add more as needed
+                },
+
+                -- Include all files in workspace for indexing
+                include = { "**/*.py" },
+
+                -- Performance: cache type information
+                extraPaths = {},
+
+                -- Only suppress the most annoying ones
+                diagnosticSeverityOverrides = {
+                    reportUnknownMemberType = "none",
+                    reportUnknownVariableType = "none",
+                },
+            },
+        },
+    },
+}
+
+-- vim.lsp.config.pylsp = {
+--     capabilities = capabilities,
+--     settings = {
+--         pylsp = {
+--             plugins = {
+--                 -- Keep only fast, essential plugins
+--                 pyflakes = { enabled = true },
+--                 pycodestyle = { enabled = false }, -- Disable for speed, use ruff instead
+--                 mccabe = { enabled = false },      -- Disable complexity checking
+--
+--                 -- Formatting - let ruff handle it
+--                 black = { enabled = false },
+--                 yapf = { enabled = false },
+--                 isort = { enabled = false },
+--
+--                 -- Keep essential Jedi features
+--                 jedi_completion = { enabled = true },
+--                 jedi_hover = { enabled = true },
+--                 jedi_references = { enabled = true },
+--                 jedi_signature_help = { enabled = true },
+--
+--                 -- Disable heavy type checking in pylsp (use basedpyright if needed)
+--                 pylsp_mypy = { enabled = false },
+--                 pylint = { enabled = false },
+--                 rope_completion = { enabled = false },
+--             }
+--         }
+--     }
+-- }
+
+
+-- vim.lsp.config.basedpyright = {
+--     capabilities = capabilities,
+--     basedpyright = {
+--         analysis = {
+--             typeCheckingMode = "off",
+--             diagnosticMode = "openFilesOnly", -- Only analyze open files
+--             autoSearchPaths = true,           -- Auto-detect common paths
+--             useLibraryCodeForTypes = true,    -- Use library code to infer types
+--             autoImportCompletions = true,     -- Auto-import suggestions
+--             indexing = true,                  -- Index workspace for faster completions
+--
+--             -- ❌ Suppress specific noisy diagnostics
+--             diagnosticSeverityOverrides = {
+--                 reportUnknownMemberType = "none",
+--                 reportUnknownVariableType = "none",
+--                 reportUnknownParameterType = "none",
+--                 reportAssignmentType = "none",
+--                 reportArgumentType = "none",
+--                 reportUnannotatedClassAttribute = "none",
+--             },
+--
+--             -- Inlay hints
+--             inlayHints = {
+--                 variableTypes = true,
+--                 functionReturnTypes = true,
+--                 callArgumentNames = true,
+--                 genericTypes = true,
+--             },
+--
+--             useTypingExtensions = false, -- For older Python versions if needed
+--         },
+--     },
+-- }
+
+vim.lsp.config.ruff = {
+    capabilities = capabilities,
+    settings = {
+        args = { "--ignore", "F722" },
+    },
 }
 
 
 require("blink.cmp").setup({
-    -- 'default' (recommended) for mappings similar to built-in completions (C-y to accept)
-    -- 'super-tab' for mappings similar to vscode (tab to accept)
-    -- 'enter' for enter to accept
-    -- 'none' for no mappings
-    --
-    -- All presets have the following mappings:
-    -- C-space: Open menu or open docs if already open
-    -- C-n/C-p or Up/Down: Select next/previous item
-    -- C-e: Hide menu
-    -- C-k: Toggle signature help (if signature.enabled = true)
-    --
-    -- See :h blink-cmp-config-keymap for defining your own keymap
     enabled = function()
-        -- Disable blink-cmp in NvimTree
-        if vim.g.blink_active then
-            return true
-        end
-        return false
+        return vim.g.blink_active ~= false -- Changed logic
     end,
+
     keymap = {
         preset = "default",
-        ["<C-space>"] = { "show", "show_documentation", "hide_documentation" },
+        ["<M-space>"] = { "show", "show_documentation", "hide_documentation" },
         ["<C-e>"] = { "hide" },
         ["<CR>"] = { "select_and_accept", "fallback" },
-
         ["<M-k>"] = { "select_prev", "fallback" },
         ["<M-j>"] = { "select_next", "fallback" },
         ["<Up>"] = { "select_prev", "fallback" },
         ["<Down>"] = { "select_next", "fallback" },
-
-        -- ["<C-j>"] = { "scroll_documentation_up", "fallback" },
-        -- ["<C-k>"] = { "scroll_documentation_down", "fallback" },
-
-        -- ["<Tab>"] = { "snippet_forward", "fallback" },
-        -- ["<S-Tab>"] = { "snippet_backward", "fallback" },
-
         ["<C-k>"] = { "show_signature", "hide_signature", "fallback" },
     },
 
     appearance = {
-        -- 'mono' (default) for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
-        -- Adjusts spacing to ensure icons are aligned
-        nerd_font_variant = "mono",
+        nerd_font_variant = "normal",
+        kind_icons = {
+            Copilot = "",
+            Text = '󰉿',
+            Method = '󰊕',
+            Function = '󰊕',
+            Constructor = '󰒓',
+            Field = '󰜢',
+            Variable = '󰆦',
+            Property = '󰖷',
+            Class = '󱡠',
+            Interface = '󱡠',
+            Struct = '󱡠',
+            Module = '󰅩',
+            Unit = '󰪚',
+            Value = '󰦨',
+            Enum = '󰦨',
+            EnumMember = '󰦨',
+            Keyword = '󰻾',
+            Constant = '󰏿',
+            Snippet = '󱄽',
+            Color = '󰏘',
+            File = '󰈔',
+            Reference = '󰬲',
+            Folder = '󰉋',
+            Event = '󱐋',
+            Operator = '󰪚',
+            TypeParameter = '󰬛',
+        },
     },
 
     completion = {
         trigger = {
-            show_on_keyword = true, -- Show completion menu on keyword
+            show_on_keyword = true,
+            show_on_insert_on_trigger_character = true, -- Show immediately on trigger chars
+            show_on_x_blocked_trigger_characters = { "'", '"', "(", "{" },
             show_on_blocked_trigger_characters = function()
                 if vim.bo.filetype == "python" then
                     return { " ", "\n", "\t", ":" }
@@ -89,155 +199,143 @@ require("blink.cmp").setup({
                 end
             end,
         },
+
+        accept = {
+            auto_brackets = {
+                enabled = true,
+            },
+        },
+
+        -- PERFORMANCE: Reduce item limit for faster rendering
+        list = {
+            max_items = 200, -- Default is 200, way too many
+        },
+
         menu = {
+            auto_show = true,
+            auto_show_delay_ms = 100, -- Faster popup
             draw = {
+                -- Simpler rendering for speed
+                columns = { { "kind_icon" }, { "label", "label_description", gap = 1 } },
                 components = {
                     kind_icon = {
                         text = function(ctx)
-                            local icon = ctx.kind_icon
-                            if vim.tbl_contains({ "Path" }, ctx.source_name) then
-                                local dev_icon, _ = require("nvim-web-devicons").get_icon(ctx.label)
-                                if dev_icon then
-                                    icon = dev_icon
-                                end
-                            else
-                                icon = require("lspkind").symbolic(ctx.kind, {
-                                    mode = "symbol",
-                                })
-                            end
-
-                            return icon .. ctx.icon_gap
-                        end,
-
-                        -- Optionally, use the highlight groups from nvim-web-devicons
-                        -- You can also add the same function for `kind.highlight` if you want to
-                        -- keep the highlight groups in sync with the icons.
-                        highlight = function(ctx)
-                            local hl = ctx.kind_hl
-                            if vim.tbl_contains({ "Path" }, ctx.source_name) then
-                                local dev_icon, dev_hl = require("nvim-web-devicons").get_icon(ctx.label)
-                                if dev_icon then
-                                    hl = dev_hl
-                                end
-                            end
-                            return hl
+                            return ctx.kind_icon .. ctx.icon_gap
                         end,
                     },
                 },
             },
         },
-        documentation = { auto_show = false },
-    },
-    signature = { enabled = true, window = { border = "single" } },
 
-    -- Default list of enabled providers defined so that you can extend it
-    -- elsewhere in your config, without redefining it, due to `opts_extend`
+        documentation = {
+            auto_show = false, -- Manual docs for speed
+            auto_show_delay_ms = 500,
+        },
+    },
+
+    signature = {
+        enabled = true,
+        window = { border = "single" },
+    },
+
     snippets = { preset = "luasnip" },
+
     sources = {
         default = function(ctx)
             local success, node = pcall(vim.treesitter.get_node)
             if success and node and vim.tbl_contains({ "comment", "line_comment", "block_comment" }, node:type()) then
                 return { "buffer" }
             else
-                return { "lsp", "path", "snippets", "buffer", "codecompanion" }
+                -- Prioritize fast sources first
+                return { "lsp", "path", "buffer", "snippets" } -- Removed copilot for speed
             end
         end,
+
+        providers = {
+            lsp = {
+                name = "LSP",
+                module = "blink.cmp.sources.lsp",
+                enabled = true,
+                score_offset = 100,     -- Prioritize LSP
+                min_keyword_length = 0, -- Show even without typing
+            },
+
+            path = {
+                name = "Path",
+                module = "blink.cmp.sources.path",
+                score_offset = 3,
+                opts = {
+                    trailing_slash = true,
+                    label_trailing_slash = true,
+                    get_cwd = function(context)
+                        return vim.fn.expand(("#%d:p:h"):format(context.bufnr))
+                    end,
+                },
+            },
+
+            snippets = {
+                name = "Snippets",
+                module = "blink.cmp.sources.snippets",
+                score_offset = -3,
+                min_keyword_length = 2,
+            },
+
+            buffer = {
+                name = "Buffer",
+                module = "blink.cmp.sources.buffer",
+                min_keyword_length = 3,
+            },
+        },
     },
 
-    -- (Default) Rust fuzzy matcher for typo resistance and significantly better performance
-    -- You may use a lua implementation instead by using `implementation = "lua"` or fallback to the lua implementation,
-    -- when the Rust fuzzy matcher is not available, by using `implementation = "prefer_rust"`jre
-    --
-    -- See the fuzzy documentation for more information require  req require require
     fuzzy = {
         implementation = "prefer_rust_with_warning",
-        sorts = {
-            "exact",
-            -- defaults
-            "score",
-            "sort_text",
+        prebuilt_binaries = {
+            download = true,
+            force_version = nil,
         },
     },
 })
 
-local function blink_active()
+
+vim.g.blink_active = true -- Start enabled
+
+
+vim.g.blink_active = true -- Start enabled
+
+local function check_blink_active()
     local win = vim.api.nvim_get_current_win()
-    local buf = vim.api.nvim_get_current_buf()
-    local bufname = vim.api.nvim_buf_get_name(buf)
-
-    -- Check if in floating window (Lspsaga rename, etc.)
     local win_config = vim.api.nvim_win_get_config(win)
+
+    -- Disable in floating windows
     if win_config.relative ~= "" then
-        print("Floating window detected:", bufname)
         vim.g.blink_active = false
         return
     end
 
-    local syn_id = vim.fn.synID(vim.fn.line("."), vim.fn.col("."), 1)
-    local syn_name = vim.fn.synIDattr(syn_id, "name")
-    if syn_name:lower():find("comment") then
-        vim.g.blink_active = false
-        return
-    end
-    -- Check if the current buffer is NvimTree
-    local bufnr = vim.api.nvim_get_current_buf()
-    local bufname = vim.api.nvim_buf_get_name(bufnr)
+    -- Disable in NvimTree
+    local bufname = vim.api.nvim_buf_get_name(0)
     if bufname:match("NvimTree_") then
         vim.g.blink_active = false
         return
     end
+
     vim.g.blink_active = true
 end
 
-vim.api.nvim_create_autocmd({ "CursorMoved" }, {
-    callback = function()
-        blink_active()
-    end,
+-- Only check on buffer/window change, not cursor movement
+vim.api.nvim_create_autocmd({ "BufEnter", "WinEnter" }, {
+    callback = check_blink_active,
 })
 
--- vim.o.updatetime = 300 -- how fast the hover shows (ms)
---
--- vim.api.nvim_create_autocmd("CursorHold", {
---     callback = function()
---         vim.diagnostic.open_float(nil, {
---             focusable = false,
---             close_events = { "BufLeave", "CursorMoved", "InsertEnter", "FocusLost" },
---             border = "rounded",
---             source = "always",
---             prefix = "",
---             scope = "cursor",
---         })
---     end,
--- })
-vim.o.updatetime = 300 -- delay before CursorHold triggers
 
-vim.api.nvim_create_autocmd("CursorHold", {
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = "python",
     callback = function()
-        -- Close any existing floating diagnostics to avoid stacking
-        for _, win in ipairs(vim.api.nvim_list_wins()) do
-            local cfg = vim.api.nvim_win_get_config(win)
-            if cfg.relative ~= "" and cfg.zindex then
-                vim.api.nvim_win_close(win, true)
-            end
-        end
-
-        -- Only show if there is a diagnostic on the current line
-        local diags = vim.diagnostic.get(0, { lnum = vim.fn.line('.') - 1 })
-        if vim.tbl_isempty(diags) then
-            return
-        end
-
-        vim.diagnostic.open_float(nil, {
-            focusable = false,
-            close_events = { "BufLeave", "CursorMoved", "InsertEnter", "FocusLost" },
-            border = "rounded",
-            source = "always",
-            prefix = "",
-            scope = "cursor",
-        })
+        vim.lsp.enable("basedpyright")
+        vim.lsp.enable("ruff")
     end,
 })
-
 
 
 vim.keymap.set("n", "gH", function()
@@ -245,6 +343,27 @@ vim.keymap.set("n", "gH", function()
 end, { desc = "Toggle LSP inlay hints" })
 
 
+-- ============================================================================
+-- ADDITIONAL PERFORMANCE SETTINGS
+-- ============================================================================
+
+-- Reduce syntax processing
+vim.opt.synmaxcol = 200 -- Don't syntax highlight super long lines
+
+-- Faster redraw
+vim.opt.lazyredraw = true
+
+-- Disable some heavy features in large files
+vim.api.nvim_create_autocmd("BufReadPre", {
+    callback = function()
+        local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(0))
+        if ok and stats and stats.size > 100000 then -- 100KB
+            vim.opt_local.foldmethod = "manual"
+            vim.opt_local.spell = false
+            vim.lsp.stop_client(vim.lsp.get_clients())
+        end
+    end,
+})
 
 
 local function make_italic(group)
