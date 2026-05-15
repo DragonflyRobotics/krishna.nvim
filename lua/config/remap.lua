@@ -1,0 +1,33 @@
+local map = vim.keymap.set
+
+map("n", "<leader>ff", function()
+  Snacks.picker.files()
+end)
+
+map("n", "<leader>fg", function()
+  Snacks.picker.grep()
+end)
+
+map("n", "<leader>fb", function()
+  Snacks.picker.buffers()
+end)
+
+map("n", "<leader>fh", function()
+  Snacks.picker.help()
+end)
+
+map("n", "<leader>e", function()
+  Snacks.explorer()
+end)
+
+vim.opt.clipboard = "unnamedplus"
+
+vim.keymap.set("n", "L", "<cmd>noh<CR><Esc>", { silent = true })
+
+vim.keymap.set({ "n", "i", "v" }, "<C-f>", function()
+  require("conform").format({ async = true, lsp_fallback = true })
+end, { desc = "Format buffer" })
+
+vim.keymap.set("n", "<leader>ft", function()
+  Snacks.picker.todo_comments()
+end, { desc = "Todo Comments" })
