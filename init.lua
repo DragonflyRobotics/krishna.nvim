@@ -3,6 +3,7 @@ require("config.set")
 require("config.remap")
 require("config.buffer")
 require("config.panes")
+require("config.terminal")
 require("config.lsp")
 
 
