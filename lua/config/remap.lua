@@ -39,11 +39,20 @@ if os.getenv("SSH_TTY") then
 end
 
 vim.keymap.set("n", "L", "<cmd>noh<CR><Esc>", { silent = true })
-
 vim.keymap.set({ "n", "i", "v" }, "<C-f>", function()
-    require("conform").format({ async = true, lsp_fallback = true })
-end, { desc = "Format buffer" })
+  require("conform").format({
+    async = true,
+    lsp_format = "fallback",
+  })
+end, {
+  desc = "Format buffer",
+})
 
-vim.keymap.set("n", "<leader>ft", function()
-    Snacks.picker.todo_comments()
-end, { desc = "Todo Comments" })
+vim.keymap.set("n", "<leader>lf", function()
+  require("conform").format({
+    async = true,
+    lsp_format = "fallback",
+  })
+end, {
+  desc = "Format buffer",
+})

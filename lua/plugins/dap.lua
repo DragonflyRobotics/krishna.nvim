@@ -31,7 +31,7 @@ return {
 		"mfussenegger/nvim-dap-python",
 
 		-- mason
-		"williamboman/mason.nvim",
+		"mason-org/mason.nvim",
 		"jay-babu/mason-nvim-dap.nvim",
 	},
 
@@ -49,7 +49,7 @@ return {
 
 		require("mason-nvim-dap").setup({
 			ensure_installed = {
-				"debugpy",
+				"python",
 				"codelldb",
 			},
 
@@ -85,7 +85,34 @@ return {
 					require("mason-nvim-dap").default_setup(config)
 				end,
 			},
-		})
+        })
+
+        local debugpy_python = vim.fn.stdpath("data")
+        .. "/mason/packages/debugpy/venv/bin/python"
+
+        require("dap-python").setup(debugpy_python)
+
+        local cpp_configurations = {
+            {
+                name = "Launch C/C++ binary",
+                type = "codelldb",
+                request = "launch",
+
+                program = function()
+                    return vim.fn.input(
+                        "Path to executable: ",
+                        vim.fn.getcwd() .. "/build/",
+                        "file"
+                    )
+                end,
+
+                cwd = "${workspaceFolder}",
+                stopOnEntry = false,
+            },
+        }
+
+        dap.configurations.c = cpp_configurations
+        dap.configurations.cpp = cpp_configurations
 
 		------------------------------------------------------------------
 		-- UI
@@ -123,5 +150,26 @@ return {
 		vim.keymap.set("n", "<Leader>dr", dap.repl.open)
 		vim.keymap.set("n", "<Leader>dl", dap.run_last)
 		vim.keymap.set("n", "<Leader>du", dapui.toggle)
+
+        vim.keymap.set("n", "<leader>dc", dap.run_to_cursor, {
+          desc = "Debug: run to cursor",
+        })
+
+        vim.keymap.set("n", "<leader>dt", dap.terminate, {
+          desc = "Debug: terminate",
+        })
+
+        vim.keymap.set({ "n", "v" }, "<leader>de", function()
+          dapui.eval()
+        end, {
+          desc = "Debug: evaluate expression",
+        })
+
+        vim.keymap.set("n", "<leader>dn", function()
+          require("dap-python").test_method()
+        end, {
+          desc = "Debug nearest Python test",
+        })
+
 	end,
 }
