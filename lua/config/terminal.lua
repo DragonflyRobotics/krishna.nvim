@@ -39,3 +39,7 @@ end, { desc = "Terminal" })
 vim.keymap.set("n", "<leader>tg", "<cmd>Git<CR>", { desc = "Lazygit" })
 vim.keymap.set("n", "<leader>tp", "<cmd>Python<CR>", { desc = "Python REPL" })
 
+vim.keymap.set("t", "<C-w>w", "<C-\\><C-n><C-w>w", {
+  desc = "Next window from terminal",
+})
+
