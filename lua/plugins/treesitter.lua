@@ -9,6 +9,19 @@ return {
                 enable = true,
                 enable_autocmd = false,
             },
-        }
+        },
+        ensure_installed = {
+            "bash",
+            "c",
+            "cpp",
+            "lua",
+            "python",
+            "rust",
+            "markdown",
+            "markdown_inline",
+            "vim",
+            "vimdoc",
+            "query",
+        },
     },
 }
