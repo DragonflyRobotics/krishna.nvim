@@ -36,6 +36,15 @@ return {
       indent = {
         enabled = false,
       },
+
+      explorer = {
+        enabled = true,
+        hidden = false,
+        ignored = false,
+        follow_file = true,
+        git_status = true,
+        git_untracked = true,
+      },
     },
   },
 }
