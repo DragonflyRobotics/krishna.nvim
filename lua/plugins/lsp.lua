@@ -11,9 +11,10 @@ return {
                 "rust_analyzer",
                 "lua_ls",
                 "clangd",
-                "pyright",
+                "basedpyright",
+                "ruff",
             },
-            automatic_enable = true,
+            automatic_enable = false,
         },
         dependencies = {
             { "mason-org/mason.nvim", opts = {} },

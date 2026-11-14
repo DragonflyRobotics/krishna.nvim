@@ -8,9 +8,8 @@ map("n", "<leader>fg", function()
     Snacks.picker.grep()
 end)
 
-map("n", "<leader>fb", function()
-    Snacks.picker.buffers()
-end)
+map("n", "<leader>fr", "<cmd>Telescope oldfiles<CR>", { desc = "Recent files" })
+map("n", "<leader>fw", "<cmd>Telescope grep_string<CR>", { desc = "Search word under cursor" })
 
 map("n", "<leader>fh", function()
     Snacks.picker.help()
@@ -58,12 +57,3 @@ end, { desc = "Todo Comments" })
 vim.api.nvim_set_keymap("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("n", "gca", "<cmd>lua vim.lsp.buf.code_action()<CR>", { noremap = true, silent = true })
-
-vim.keymap.set("n", "<leader>lf", function()
-  require("conform").format({
-    async = true,
-    lsp_format = "fallback",
-  })
-end, {
-  desc = "Format buffer",
-})

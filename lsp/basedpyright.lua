@@ -22,8 +22,12 @@ return {
     basedpyright = {
       analysis = {
         autoImportCompletions = true,
-        diagnosticMode = "openFilesOnly",
+        diagnosticMode = "workspace",
         typeCheckingMode = "standard",
+        inlayHints = {
+          variableTypes = true,
+          functionReturnTypes = true,
+        },
       },
     },
   },

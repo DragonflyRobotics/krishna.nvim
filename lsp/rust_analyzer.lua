@@ -23,6 +23,11 @@ return {
         command = "clippy",
       },
 
+      inlayHints = {
+        typeHints = { enable = true },
+        parameterHints = { enable = true },
+      },
+
       procMacro = {
         enable = true,
       },
